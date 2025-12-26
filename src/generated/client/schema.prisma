@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  role         String        @default("CUSTOMER") // CUSTOMER, ADMIN
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Barber {
+  id           String         @id @default(uuid())
+  name         String
+  specialty    String?
+  photoUrl     String?
+  appointments Appointment[]
+  workingHours WorkingHours[]
+  blockedDates BlockedDate[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Service {
+  id           String        @id @default(uuid())
+  name         String
+  price        Float
+  duration     Int // Duration in minutes
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+// Jam kerja barber per hari (0=Sunday, 1=Monday, ..., 6=Saturday)
+model WorkingHours {
+  id        String   @id @default(uuid())
+  barberId  String
+  barber    Barber   @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  dayOfWeek Int // 0-6 (Sunday-Saturday)
+  startTime String // Format: "09:00"
+  endTime   String // Format: "21:00"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([barberId, dayOfWeek])
+}
+
+// Hari libur / blocked dates
+model BlockedDate {
+  id        String   @id @default(uuid())
+  barberId  String
+  barber    Barber   @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([barberId, date])
+}
+
+model Appointment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  barberId  String
+  barber    Barber   @relation(fields: [barberId], references: [id])
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  status    String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([barberId, startTime])
+  @@index([userId])
+  @@index([status])
+}
