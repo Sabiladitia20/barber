@@ -1,8 +1,7 @@
 # Parmato Barber Studio - Booking System
 
-![Parmato Banner](https://via.placeholder.com/1000x300?text=Parmato+Barber+Studio)
 
-Parmato (formerly LuxeCuts) is a modern, responsive web application for booking barber appointments. It provides a seamless experience for customers to browse styles, select barbers, and schedule appointments, while offering a comprehensive dashboard for administrators to manage their business.
+Parmato, responsive web application for booking barber appointments. It provides a seamless experience for customers to browse styles, select barbers, and schedule appointments, while offering a comprehensive dashboard for administrators to manage their business.
 
 ## 🚀 Features
 
